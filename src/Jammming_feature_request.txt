@@ -1,0 +1,100 @@
+link to Google Doc:
+https://docs.google.com/document/d/1XeRNzHnLSFNrEWfRxddEIynzlG2VEhEJDBDhGdnZ5Mc/edit?usp=sharing
+
+
+
+Jammming Design Update
+
+
+September 14, 2017
+Search with ‘Enter’ Keystroke
+OBJECTIVE
+This feature request allows the user to institute a search by pressing the Enter key.  This feature is intended to improve the user experience, allowing an all-keyed search entry, with no necessary reliance on a mouse or trackpad.
+BACKGROUND 
+Similar ‘Enter’ key implementations can be found on the Google.com search page. When a user keys in a search term or phrase, they have the option of clicking on the “Google Search” button or simply pressing ‘Enter’. It was a point of frustration for this developer, and family and friends who tried out the app, that pressing ‘Enter’ did not trigger a search. This solution should be fairly simple and quick to implement, as described below. This combined with the number of UI instances it would ease make it a priority for implementation.
+TECHNICAL DESIGN
+This feature requires no additional components needed for implementation. The existing SearchBar component will be updated with an additional method, handleKeyPress, as follows: bind this.handleKeyPress in the SearchBar constructor, add a handleKeyPress method that compares the keyPress to the charCode 13 - run this.search() if the two equal each other, and add an onKeyPress attribute that points to this.handleKeyPress to the input tag in the render section.
+Addressing edge cases: to ensure the user does not submit a search due to keyPress of a different key, run a comparison of the keyed event and match it to charCode 13 (the ‘Enter’ key) before using the keystroke to trigger a search.
+class SearchBar extends React.Component {
+        constructor(props) {
+                super(props);
+                this.state = { term: '' };
+                this.search = this.search.bind(this);
+                this.handleTermChange = this.handleTermChange.bind(this);
+                this.handleKeyPress = this.handleKeyPress.bind(this);
+        }
+
+
+        handleKeyPress(e) {
+                if (e.charCode === 13) {
+                        // console.log('Enter key pressed');
+                        this.search();
+                }
+        }
+
+
+        search() {
+                this.props.onSearch(this.state.term);
+        }
+
+
+        handleTermChange(event) {
+                this.setState({ term: event.target.value });
+        }
+
+
+        render() {
+                return (
+                        <div className="SearchBar">
+                                <input
+                                        onChange={this.handleTermChange}
+                                        onKeyPress={this.handleKeyPress}
+                                        placeholder="Enter A Song, Album, or Artist"
+                                />
+                                <a onClick={this.search}>SEARCH</a>
+                        </div>
+                );
+        }
+}
+
+
+There will be no visual change to the end user experience.
+
+
+CAVEATS
+The provided solution appears to be reliable and robust.  Alternately, the solution could involve placing the method in the JSX, as follows: add onKeyPress={e => { if (charCode === 13) { this.search();}}} to the input tag in the render section of the SearchBar component.
+
+
+class SearchBar extends React.Component {
+        constructor(props) {
+                super(props);
+                this.state = { term: '' };
+                this.search = this.search.bind(this);
+                this.handleTermChange = this.handleTermChange.bind(this);
+        }
+
+
+        search() {
+                this.props.onSearch(this.state.term);
+        }
+
+
+        handleTermChange(event) {
+                this.setState({ term: event.target.value });
+        }
+
+
+        render() {
+                return (
+                        <div className="SearchBar">
+                                <input
+                                        onChange={this.handleTermChange}
+onKeyPress={e => { if (charCode === 13) { this.search();}}}
+                                        placeholder="Enter A Song, Album, or Artist"
+                                />
+                                <a onClick={this.search}>SEARCH</a>
+                        </div>
+                );
+        }
+}
+This option is not as appealing as the suggested implementation because it is not as clearly written.
